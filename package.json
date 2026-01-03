@@ -1,5 +1,5 @@
 {
-  "name": "@skyzopedia/baileys-pro",
+  "name": "@dark-shan-yt/baileys",
   "version": "8.0.5",
   "description": "Websocket Whatsapp API for Node.js",
   "keywords": [
@@ -12,13 +12,13 @@
     "proto",
     "whatsapp-websocket"
   ],
-  "homepage": "https://github.com/skyzopedia/Baileys",
+  "homepage": "https://github.com/DARK-SHAN-YT/DS-BY/",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/skyzopedia/Baileys.git"
+    "url": "git+ssh://git@ggithub.com/DARK-SHAN-YT/DS-BY/git"
   },
   "license": "MIT",
-  "author": "Skyzopedia",
+  "author": "kushansewmina",
   "main": "./lib/index.js",
   "files": [
     "lib/*",
