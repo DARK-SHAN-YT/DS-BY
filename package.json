@@ -39,7 +39,7 @@
     "@whiskeysockets/eslint-config": "github:whiskeysockets/eslint-config",
     "@cacheable/node-cache": "*",
     "gradient-string": "2.0.2",
-    "libsignal-xeuka": "npm:@skyzopedia/libsignal-node",
+    "libsignal-xeuka": "npm:@socketon/libsignal-node",
     "moment-timezone": "*",
     "music-metadata": "*",
     "cache-manager": "*",
