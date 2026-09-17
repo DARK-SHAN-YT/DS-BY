@@ -1,0 +1,27 @@
+name: Elaina stale issue cleanup
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: 'This Elaina Baileys issue is stale because it has had no activity for 3 days.'
+          stale-pr-message: 'This Elaina Baileys PR is stale because it has had no activity for 3 days.'
+          close-issue-message: 'Closing this issue due to inactivity for more than 1 days.'
+          close-pr-message: 'Closing this PR due to inactivity for more than 1 days.'
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'
+          days-before-stale: 3
+          days-before-close: 1

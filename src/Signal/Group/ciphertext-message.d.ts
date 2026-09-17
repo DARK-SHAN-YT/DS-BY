@@ -1,0 +1,10 @@
+/* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
+export class CiphertextMessage {
+    UNSUPPORTED_VERSION: number;
+    CURRENT_VERSION: number;
+    WHISPER_TYPE: number;
+    PREKEY_TYPE: number;
+    SENDERKEY_TYPE: number;
+    SENDERKEY_DISTRIBUTION_TYPE: number;
+    ENCRYPTED_MESSAGE_OVERHEAD: number;
+}
