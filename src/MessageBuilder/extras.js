@@ -62,7 +62,10 @@ export const AI_RICH_PRIMITIVES = Object.freeze([
     'GenAIFooterActionPrimitive',
     'GenAIClippyWidgetPrimitive',
     'GenAIClippyFollowUpPrimitive',
-    'GenAIaeacdsnwHtmlPrimitive'
+    'GenAIaeacdsnwHtmlPrimitive',
+    'GenAIQuizPrimitive',
+    'GenAIActionGroupPrimitive',
+    'GenAIFusedComparisonTablePrimitive'
 ])
 
 export const AI_RICH_PRIMITIVE_INTERFACE = 'GenAIUXPrimitive'
@@ -594,6 +597,11 @@ export const AI_RICH_UNIFIED_RESPONSE_TYPENAME_APP = 'GenAIUnifiedResponse'
 export const AI_RICH_NESTED_UNIFIED_RESPONSE_TYPENAME = 'GenAINestedUnifiedResponse'
 
 export const AI_RICH_NODES = Object.freeze([
+    'GenAIQuizQuestion',
+    'GenAIActionButton',
+    'GenAIFusedComparisonColumn',
+    'GenAIFusedComparisonRow',
+    'GenAIFusedComparisonCTA',
     'FOAEmbeddedSingleScreen',
     'GenAI3PAccountLinkingBottomsheet',
     'GenAI3PExtArtifactConfirmation',

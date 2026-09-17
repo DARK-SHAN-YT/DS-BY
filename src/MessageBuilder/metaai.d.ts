@@ -355,6 +355,63 @@ export declare function quotaUpsellSection(options?: {
     buttons?: any[];
 }): any;
 
+export declare function quizQuestion(question?: {
+    question?: string;
+    options?: any[];
+    correctIndices?: number[];
+    explanation?: string;
+    hints?: any[];
+}): any;
+
+export declare function quizSection(options?: {
+    title?: string;
+    subject?: string;
+    questions?: any[];
+}): any;
+
+export declare function actionGroupButton(button?: {
+    actionId?: string;
+    clientActionId?: string;
+    label?: string;
+    deeplink?: any;
+    deeplinkUrl?: string;
+    androidDeeplinkUrl?: string;
+}): any;
+
+export declare function actionGroupSection(options?: {
+    groupId?: string;
+    recommendedActionId?: string;
+    buttons?: any[];
+}): any;
+
+export declare function fusedComparisonCta(cta?: {
+    label?: string;
+    uri?: string;
+}): any;
+
+export declare function fusedComparisonColumn(column?: {
+    productId?: string | number;
+    title?: string;
+    productUrl?: string;
+    merchant?: string;
+    image?: any;
+    price?: string;
+    originalPrice?: string;
+    cta?: any;
+}): any;
+
+export declare function fusedComparisonRow(row?: {
+    label?: string;
+    cells?: any[];
+}): any;
+
+export declare function fusedComparisonSection(options?: {
+    columns?: any[];
+    rows?: any[];
+    labelColumnIndex?: number;
+    pinLabelColumn?: boolean;
+}): any;
+
 export interface SignedRichResponse {
     richResponseMessage: any;
     botMetadata?: any;

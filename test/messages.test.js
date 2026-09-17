@@ -1272,7 +1272,7 @@ test('airich-namespace', async () => {
 
     const members = [...Object.keys(extras), ...Object.keys(metaai)].filter(name => name !== 'default');
     assert.equal(new Set(members).size, members.length, 'extras and metaai must not export the same name twice');
-    assert.equal(members.length, 161, 'the README quotes this count, update both together');
+    assert.equal(members.length, 169, 'the README quotes this count, update both together');
 
     for (const name of members) {
         assert.equal(AIRich[name], (extras[name] ?? metaai[name]), `AIRich.${name} has to be the same member as the named export`);
@@ -1294,7 +1294,7 @@ test('airich-namespace', async () => {
         assert.equal(typeof MB[name], 'function', `MB.${name} has to be the class`);
     }
     assert.equal(MB.AIRich, AIRich, 'MB holds the same class, not a copy');
-    assert.equal(Object.keys(MB).length, 187, 'the README quotes this count, update both together');
+    assert.equal(Object.keys(MB).length, 195, 'the README quotes this count, update both together');
 
     const lib = await import('../src/index.js');
     for (const builder of [Button, ButtonV2, Carousel, AIRich, Toolkit]) {
@@ -1341,7 +1341,7 @@ test('toolkit-image-source', async () => {
 test('airich-node-catalog', async () => {
     const MB = (await import('../src/index.js')).MB;
 
-    assert.equal(MB.AI_RICH_NODES.length, 45, 'every entry is backed by a <name>Impl.kt model class in the APK');
+    assert.equal(MB.AI_RICH_NODES.length, 50, 'every entry is backed by a <name>Impl.kt model class in the APK');
     assert.equal(new Set(MB.AI_RICH_NODES).size, MB.AI_RICH_NODES.length, 'no duplicates');
 
     const catalogued = new Set([...MB.AI_RICH_PRIMITIVES, ...MB.AI_RICH_ITEMS, ...MB.AI_RICH_LAYOUTS.map(n => `GenAI${n}LayoutViewModel`)]);
@@ -1361,7 +1361,7 @@ test('airich-node-catalog', async () => {
     assert.equal(MB.AI_RICH_PRIMITIVE_INTERFACE, 'GenAIUXPrimitive');
     assert.equal(MB.AI_RICH_PRIMITIVES.includes(MB.AI_RICH_PRIMITIVE_INTERFACE), false,
         'cometComposedTextV2GenAiUxPrimitiveParser dispatches on every concrete name, so GenAIUXPrimitive is the interface and never a __typename on the wire');
-    assert.equal(MB.AI_RICH_PRIMITIVES.length, 45, 'the README quotes this count, update both together');
+    assert.equal(MB.AI_RICH_PRIMITIVES.length, 48, 'the README quotes this count, update both together');
 
     for (const name of MB.AI_RICH_PRIMITIVES_WITHOUT_SCHEMA) {
         assert.equal(MB.AI_RICH_PRIMITIVES.includes(name), true, `${name} is still a concrete primitive`);

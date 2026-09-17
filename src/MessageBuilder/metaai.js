@@ -742,6 +742,68 @@ export const quotaUpsellSection = ({ title, body, bodyLine1, bodyLine2, meterUsa
         buttons: buttons.length ? buttons : undefined
     }))
 
+export const quizQuestion = ({ question, options = [], correctIndices = [], explanation, hints = [] } = {}) =>
+    typed('GenAIQuizQuestion', {
+        question,
+        options: options.length ? options : undefined,
+        correct_indices: correctIndices.length ? correctIndices : undefined,
+        explanation,
+        hints: hints.length ? hints : undefined
+    })
+
+export const quizSection = ({ title, subject, questions = [] } = {}) =>
+    AIRich.newLayout('Single', typed('GenAIQuizPrimitive', {
+        title,
+        subject,
+        questions: questions.map(question => (question && question.__typename ? question : quizQuestion(question)))
+    }))
+
+export const actionGroupButton = ({ actionId, clientActionId, label, deeplink, deeplinkUrl, androidDeeplinkUrl } = {}) =>
+    typed('GenAIActionButton', {
+        action_id: actionId,
+        client_action_id: clientActionId,
+        label,
+        deeplink,
+        deeplink_url: deeplinkUrl,
+        android_deeplink_url: androidDeeplinkUrl
+    })
+
+export const actionGroupSection = ({ groupId, recommendedActionId, buttons = [] } = {}) =>
+    AIRich.newLayout('Single', typed('GenAIActionGroupPrimitive', {
+        group_id: groupId,
+        recommended_action_id: recommendedActionId,
+        buttons: buttons.map(button => (button && button.__typename ? button : actionGroupButton(button)))
+    }))
+
+export const fusedComparisonCta = ({ label, uri } = {}) =>
+    typed('GenAIFusedComparisonCTA', { label, uri })
+
+export const fusedComparisonColumn = ({ productId, title, productUrl, merchant, image, price, originalPrice, cta } = {}) =>
+    typed('GenAIFusedComparisonColumn', {
+        product_id: productId === undefined ? undefined : String(productId),
+        title,
+        product_url: productUrl,
+        merchant,
+        image,
+        price,
+        original_price: originalPrice,
+        cta: cta && cta.__typename ? cta : cta ? fusedComparisonCta(cta) : undefined
+    })
+
+export const fusedComparisonRow = ({ label, cells = [] } = {}) =>
+    typed('GenAIFusedComparisonRow', {
+        label,
+        cells: cells.length ? cells : undefined
+    })
+
+export const fusedComparisonSection = ({ columns = [], rows = [], labelColumnIndex, pinLabelColumn } = {}) =>
+    AIRich.newLayout('Single', typed('GenAIFusedComparisonTablePrimitive', {
+        columns: columns.map(column => (column && column.__typename ? column : fusedComparisonColumn(column))),
+        rows: rows.map(row => (row && row.__typename ? row : fusedComparisonRow(row))),
+        label_column_index: labelColumnIndex,
+        pin_label_column: pinLabelColumn
+    }))
+
 const toBytes = (value) => {
     if (value === undefined || value === null) {
         return undefined

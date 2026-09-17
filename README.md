@@ -1320,7 +1320,7 @@ MessageBuilder v4.7 sudah disertakan langsung di dalam `@rexxhayanasi/elaina-bai
 
 ### Satu impor, seluruh builder
 
-Permukaan builder-nya terdiri dari 187 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
+Permukaan builder-nya terdiri dari 195 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'
@@ -2108,7 +2108,7 @@ Inline entity satu-satunya tempat nama yang tidak dikenal jadi fatal, bukan diab
 
 #### Sub-node di dalam primitifnya
 
-Karena pesan Meta AI **diteruskan** dari Meta AI dan bukan dibangun sendiri, yang penting bukan apakah sebuah nama tergambar, tapi apakah dekodernya mengenalinya. Tiga daftar di atas cuma menyebut node setingkat section. Di bawah setiap primitif masih ada objek bersarang dengan `__typename`-nya sendiri — baris tabel, ikon tim, jam buka sebuah tempat — dan `AI_RICH_NODES` mendaftar **45** di antaranya.
+Karena pesan Meta AI **diteruskan** dari Meta AI dan bukan dibangun sendiri, yang penting bukan apakah sebuah nama tergambar, tapi apakah dekodernya mengenalinya. Tiga daftar di atas cuma menyebut node setingkat section. Di bawah setiap primitif masih ada objek bersarang dengan `__typename`-nya sendiri — baris tabel, ikon tim, jam buka sebuah tempat — dan `AI_RICH_NODES` mendaftar **50** di antaranya.
 
 Tiap entri di daftar itu punya bukti yang sama: APK membawa kelas model Kotlin `<nama>Impl.kt` untuknya. Itu juga pembeda yang memisahkannya dari flag AB dan nama telemetri, yang bentuknya mirip tapi tidak pernah punya kelas model.
 
@@ -2302,7 +2302,7 @@ Satu jebakan yang memang ada di parser-nya: kartunya dibuang utuh kalau `meter_u
 
 #### `GenAIUXPrimitive` itu interface, bukan primitif
 
-Namanya ada di dex sebagai `GenAIUXPrimitiveImpl.kt` dan sempat ikut terdaftar di `AI_RICH_PRIMITIVES`. Itu keliru. `cometComposedTextV2GenAiUxPrimitiveParser` adalah dispatcher yang mencacah setiap nama konkret, dan parser layout — `CometComposedTextV2GenAISingleLayoutViewModelParser.react` untuk `view_model.primitive`, `...GenAIGridLayoutViewModelParser.react` untuk `view_model.primitives` — memanggil dispatcher itu untuk setiap isinya. Jadi `GenAIUXPrimitive` adalah tipe interface dari field tersebut, bukan `__typename` yang pernah muncul di wire; mengirimnya mendarat di `buildUnsupportedURTypeNode`. Sekarang ia duduk sendiri di `AI_RICH_PRIMITIVE_INTERFACE`, dan `AI_RICH_PRIMITIVES` tinggal **45** nama yang benar-benar bisa dikirim.
+Namanya ada di dex sebagai `GenAIUXPrimitiveImpl.kt` dan sempat ikut terdaftar di `AI_RICH_PRIMITIVES`. Itu keliru. `cometComposedTextV2GenAiUxPrimitiveParser` adalah dispatcher yang mencacah setiap nama konkret, dan parser layout — `CometComposedTextV2GenAISingleLayoutViewModelParser.react` untuk `view_model.primitive`, `...GenAIGridLayoutViewModelParser.react` untuk `view_model.primitives` — memanggil dispatcher itu untuk setiap isinya. Jadi `GenAIUXPrimitive` adalah tipe interface dari field tersebut, bukan `__typename` yang pernah muncul di wire; mengirimnya mendarat di `buildUnsupportedURTypeNode`. Sekarang ia duduk sendiri di `AI_RICH_PRIMITIVE_INTERFACE`, dan `AI_RICH_PRIMITIVES` tinggal **48** nama yang benar-benar bisa dikirim.
 
 #### Dua primitif yang bentuknya belum terbaca
 

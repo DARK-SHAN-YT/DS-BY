@@ -1473,3 +1473,30 @@ test('airich-wrapper', async () => {
     assert.equal(editPlain.message.protocolMessage.type, 14);
     assert.equal(editPlain.message.botForwardedMessage, null);
 });
+
+test('new-airich-sections-2.26.37.6', async () => {
+    const MB = (await import('../src/MessageBuilder/metaai.js'));
+
+    const quiz = MB.quizSection({ title: 'Kuis', subject: 'Umum', questions: [{ question: '1+1?', options: ['1', '2'], correctIndices: [1], explanation: 'dua', hints: ['angka'] }] });
+    assert.equal(quiz.view_model.primitive.__typename, 'GenAIQuizPrimitive');
+    assert.equal(quiz.view_model.primitive.subject, 'Umum');
+    assert.equal(quiz.view_model.primitive.questions[0].__typename, 'GenAIQuizQuestion');
+    assert.deepEqual(quiz.view_model.primitive.questions[0].correct_indices, [1]);
+    assert.deepEqual(quiz.view_model.primitive.questions[0].options, ['1', '2']);
+
+    const group = MB.actionGroupSection({ groupId: 'g1', recommendedActionId: 'a1', buttons: [{ actionId: 'a1', label: 'Beli', deeplinkUrl: 'https://x' }] });
+    assert.equal(group.view_model.primitive.__typename, 'GenAIActionGroupPrimitive');
+    assert.equal(group.view_model.primitive.group_id, 'g1');
+    assert.equal(group.view_model.primitive.recommended_action_id, 'a1');
+    assert.equal(group.view_model.primitive.buttons[0].__typename, 'GenAIActionButton');
+    assert.equal(group.view_model.primitive.buttons[0].deeplink_url, 'https://x');
+
+    const fused = MB.fusedComparisonSection({ columns: [{ productId: 7, title: 'A', price: '10', cta: { label: 'Beli', uri: 'https://x' } }], rows: [{ label: 'Harga', cells: ['10', '20'] }], labelColumnIndex: 0, pinLabelColumn: true });
+    assert.equal(fused.view_model.primitive.__typename, 'GenAIFusedComparisonTablePrimitive');
+    assert.equal(fused.view_model.primitive.columns[0].__typename, 'GenAIFusedComparisonColumn');
+    assert.equal(fused.view_model.primitive.columns[0].product_id, '7');
+    assert.equal(fused.view_model.primitive.columns[0].cta.__typename, 'GenAIFusedComparisonCTA');
+    assert.equal(fused.view_model.primitive.rows[0].__typename, 'GenAIFusedComparisonRow');
+    assert.deepEqual(fused.view_model.primitive.rows[0].cells, ['10', '20']);
+    assert.equal(fused.view_model.primitive.pin_label_column, true);
+});
