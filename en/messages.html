@@ -27,7 +27,7 @@
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html">Overview</a><a href="./getting-started.html">Getting started</a><a href="./messages.html" class="active">Messages</a><a href="./builder.html">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Groups</a><a href="./examples.html">Examples</a><a href="./api.html">API reference</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
+      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina" rel="noreferrer">npm</a>
       <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
@@ -77,7 +77,7 @@ console.log('participant:', key.participant)
 console.log('participantAlt:', key.participantAlt)</code></pre></div>
 <p><code>remoteJidAlt</code> and <code>participantAlt</code> hold the alternate address, so an application that prefers phone-number JIDs can use them. Keep the original around too — some protocol operations still need the address WhatsApp originally sent.</p>
 <p>Normalise with the built-in helpers rather than string surgery:</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { jidDecode, jidEncode, jidNormalizedUser } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { jidDecode, jidEncode, jidNormalizedUser } from '@rexxhayanasi/elaina'
 
 const normalized = jidNormalizedUser(jid)
 const decoded = jidDecode(jid)</code></pre></div>
@@ -150,7 +150,7 @@ const decoded = jidDecode(jid)</code></pre></div>
       body: 'Modern WhatsApp Multi-Device library',
       mediaType: 1,
       thumbnailUrl: 'https://example.com/elaina.jpg',
-      sourceUrl: 'https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys',
+      sourceUrl: 'https://www.npmjs.com/package/@rexxhayanasi/elaina',
       renderLargerThumbnail: true,
       showAdAttribution: false
     }

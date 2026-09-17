@@ -27,7 +27,7 @@
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html" class="active">Ringkasan</a><a href="./getting-started.html">Mulai cepat</a><a href="./messages.html">Pesan</a><a href="./builder.html">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Grup</a><a href="./examples.html">Contoh</a><a href="./api.html">Referensi API</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
+      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina" rel="noreferrer">npm</a>
       <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
@@ -41,10 +41,10 @@
 <h2 id="mulai-dari-mana">Mulai dari mana<a class="anchor" href="#mulai-dari-mana" aria-label="link">#</a></h2>
 <ul><li><a href="./getting-started.html">Mulai cepat</a> — pasang, sambungkan, pasangkan perangkat</li><li><a href="./messages.html">Pesan</a> — terima, baca, dan kirim</li><li><a href="./builder.html">MessageBuilder</a> — pesan interaktif</li><li><a href="./newsletter.html">Newsletter</a> — channel</li><li><a href="./groups.html">Grup</a> — grup dan komunitas</li><li><a href="./examples.html">Contoh</a> — bot lengkap</li><li><a href="./api.html">Referensi API</a> — semua method, dibangkitkan dari kode</li></ul>
 <h2 id="pemasangan">Pemasangan<a class="anchor" href="#pemasangan" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @rexxhayanasi/elaina-baileys</code></pre></div>
+<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @rexxhayanasi/elaina</code></pre></div>
 <p>Butuh Node.js 22 atau lebih baru. Paket ini ESM-first, jadi pakai <code>import</code>, bukan <code>require()</code>.</p>
 <h2 id="versi-terpendek-yang-sudah-jalan">Versi terpendek yang sudah jalan<a class="anchor" href="#versi-terpendek-yang-sudah-jalan" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina'
 
 const { state, saveCreds } = await useMultiFileAuthState('./session')
 const sock = makeWASocket({ auth: state })
