@@ -81,6 +81,7 @@ export function makeChatsSocket(config: any): {
     }) => Promise<boolean>;
     removeUsername: () => Promise<boolean>;
     setUsernamePin: (pin: string) => Promise<boolean>;
+    removeUsernamePin: () => Promise<boolean>;
     checkUsernameAvailability: (username: string, options?: {
         sessionId?: string;
         source?: string;
@@ -222,6 +223,7 @@ export function makeChatsSocket(config: any): {
     executeUSyncQuery: (usyncQuery: any) => Promise<any>;
     onWhatsApp: (...phoneNumber: any[]) => Promise<any>;
     onWhatsAppUsername: (...usernames: any[]) => Promise<any>;
+    getUsernames: (...jids: any[]) => Promise<any>;
     fetchAccountReachoutTimelock: () => Promise<{
         isActive: boolean;
         timeEnforcementEnds: Date | undefined;

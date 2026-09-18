@@ -381,6 +381,10 @@ export const makeChatsSocket = (config) => {
         const response = await executeWMexQuery({ pin: value }, QueryIds.USERNAME_PIN_SET, XWAPaths.xwa2_username_pin_set);
         return response?.result === 'SUCCESS';
     };
+    const removeUsernamePin = async () => {
+        const response = await executeWMexQuery({ pin: null }, QueryIds.USERNAME_PIN_SET, XWAPaths.xwa2_username_pin_set);
+        return response?.result === 'SUCCESS';
+    };
     const updateTextStatus = async (text, options = {}) => {
         const input = {
             text: text === '' ? null : text ?? null,
@@ -1391,6 +1395,7 @@ export const makeChatsSocket = (config) => {
         setUsername,
         removeUsername,
         setUsernamePin,
+        removeUsernamePin,
         checkUsernameAvailability,
         updateTextStatus,
         fetchTextStatus,

@@ -3962,6 +3962,7 @@ console.log(current) // { username: 'elaina', state: 'ACTIVE', pin: '1234' }
 
 await sock.setUsername('elaina')
 await sock.setUsernamePin('1234')
+await sock.removeUsernamePin()
 await sock.removeUsername()
 ```
 
@@ -4429,6 +4430,17 @@ const withPin = await sock.onWhatsAppUsername({ username: 'elaina', pin: '1234' 
 ```
 
 Terima satu atau banyak username sekaligus: string biasa, atau objek `{ username, pin }` kalau username itu dilindungi PIN. Mengembalikan `[{ jid, exists }]` — `jid` adalah JID hasil resolve dari server. Di balik layar ini USync query protokol `contact` dengan atribut `username`/`pin` (bentuk node yang sama dipakai klien resmi), dan JID dibaca dari `jid` node balasan.
+
+Arah sebaliknya — **JID → `@username`** — pakai `getUsernames`:
+
+```js
+const names = await sock.getUsernames('628123@s.whatsapp.net', '234256710246613@lid')
+for (const entry of names) {
+  console.log(entry.jid, entry.username)
+}
+```
+
+Terima satu atau banyak JID. Mengembalikan `[{ jid, username }]` hanya untuk JID yang memang punya username publik. Di balik layar ini USync query protokol `username` (`usync_username`), username dibaca dari isi node `<username>` balasan.
 
 ---
 

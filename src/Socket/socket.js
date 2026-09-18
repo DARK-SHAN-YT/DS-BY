@@ -8,7 +8,7 @@ import { DEF_CALLBACK_PREFIX, DEF_TAG_PREFIX, INITIAL_PREKEY_COUNT, MIN_PREKEY_C
 import { NewChatMessageCappingStatusType, QueryIds, ReachoutTimelockEnforcementType } from '../Types/index.js';
 import { DisconnectReason, XWAPaths } from '../Types/index.js';
 import { addTransactionCapability, aesEncryptCTR, bindWaitForConnectionUpdate, buildPairingQRData, bytesToCrockford, configureSuccessfulPairing, Curve, derivePairingCodeKey, generateLoginNode, generateMdTagPrefix, generateRegistrationNode, getCodeFromWSError, getCompanionPlatformId, getErrorCodeFromStreamError, getNextPreKeysNode, makeEventBuffer, makeNoiseHandler, promiseTimeout, signedKeyPair, xmppSignedPreKey } from '../Utils/index.js';
-import { assertNodeErrorFree, binaryNodeToString, encodeBinaryNode, getAllBinaryNodeChildren, getBinaryNodeChild, getBinaryNodeChildren, isLidUser, jidDecode, jidEncode, S_WHATSAPP_NET } from '../WABinary/index.js';
+import { assertNodeErrorFree, binaryNodeToString, encodeBinaryNode, getAllBinaryNodeChildren, getBinaryNodeChild, getBinaryNodeChildren, isLidUser, jidDecode, jidEncode, jidNormalizedUser, S_WHATSAPP_NET } from '../WABinary/index.js';
 import { BinaryInfo } from '../WAM/BinaryInfo.js';
 import { USyncQuery, USyncUser } from '../WAUSync/index.js';
 import { WebSocketClient } from './Client/index.js';
@@ -258,6 +258,29 @@ export const makeSocket = (config) => {
         const results = await executeUSyncQuery(usyncQuery);
         if (results) {
             return results.list.filter(a => !!a.contact).map(({ contact, id }) => ({ jid: id, exists: contact }));
+        }
+        return [];
+    };
+    const getUsernames = async (...jids) => {
+        const list = jids.flat();
+        let usyncQuery = new USyncQuery().withUsernameProtocol();
+        let added = 0;
+        for (const entry of list) {
+            const value = typeof entry === 'string' ? entry : '';
+            if (!value || !value.includes('@')) {
+                continue;
+            }
+            usyncQuery.withUser(new USyncUser().withId(jidNormalizedUser(value)));
+            added++;
+        }
+        if (added === 0) {
+            return [];
+        }
+        const results = await executeUSyncQuery(usyncQuery);
+        if (results) {
+            return results.list
+                .filter(a => typeof a.username === 'string' && a.username.length > 0)
+                .map(({ username, id }) => ({ jid: id, username }));
         }
         return [];
     };
@@ -1050,6 +1073,7 @@ export const makeSocket = (config) => {
         executeUSyncQuery,
         onWhatsApp,
         onWhatsAppUsername,
+        getUsernames,
         fetchAccountReachoutTimelock,
         fetchNewChatMessageCap
     };
