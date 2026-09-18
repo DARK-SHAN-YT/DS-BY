@@ -2971,6 +2971,7 @@ export namespace proto {
     }
 
     interface IClientPayload {
+        messageSts?: (number|Long|null);
         username?: (number|Long|null);
         passive?: (boolean|null);
         userAgent?: (proto.ClientPayload.IUserAgent|null);
@@ -3010,6 +3011,7 @@ export namespace proto {
     }
 
     class ClientPayload implements IClientPayload {
+        public messageSts?: (number|Long|null);
         constructor(p?: proto.IClientPayload);
         public username?: (number|Long|null);
         public passive?: (boolean|null);

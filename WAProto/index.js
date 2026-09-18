@@ -20095,6 +20095,7 @@ export const proto = $root.proto = (() => {
         ClientPayload.prototype.pairedPeripherals = $util.emptyArray;
         ClientPayload.prototype.testIsolationId = null;
 
+        ClientPayload.prototype.messageSts = null;
         let $oneOfFields;
 
         // Virtual OneOf for proto3 optional field
@@ -20301,6 +20302,11 @@ export const proto = $root.proto = (() => {
             set: $util.oneOfSetter($oneOfFields)
         });
 
+        Object.defineProperty(ClientPayload.prototype, "_messageSts", {
+            get: $util.oneOfGetter($oneOfFields = ["messageSts"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
         ClientPayload.create = function create(properties) {
             return new ClientPayload(properties);
         };
@@ -20386,6 +20392,8 @@ export const proto = $root.proto = (() => {
             }
             if (m.testIsolationId != null && Object.hasOwnProperty.call(m, "testIsolationId"))
                 w.uint32(386).bytes(m.testIsolationId);
+            if (m.messageSts != null && Object.hasOwnProperty.call(m, "messageSts"))
+                w.uint32(392).int64(m.messageSts);
             return w;
         };
 
@@ -20553,6 +20561,10 @@ export const proto = $root.proto = (() => {
                     }
                 case 48: {
                         m.testIsolationId = r.bytes();
+                        break;
+                    }
+                case 49: {
+                        m.messageSts = r.int64();
                         break;
                     }
                 default:
@@ -20894,6 +20906,16 @@ export const proto = $root.proto = (() => {
                 else if (d.testIsolationId.length >= 0)
                     m.testIsolationId = d.testIsolationId;
             }
+            if (d.messageSts != null) {
+                if ($util.Long)
+                    (m.messageSts = $util.Long.fromValue(d.messageSts)).unsigned = false;
+                else if (typeof d.messageSts === "string")
+                    m.messageSts = parseInt(d.messageSts, 10);
+                else if (typeof d.messageSts === "number")
+                    m.messageSts = d.messageSts;
+                else if (typeof d.messageSts === "object")
+                    m.messageSts = new $util.LongBits(d.messageSts.low >>> 0, d.messageSts.high >>> 0).toNumber(false);
+            }
             return m;
         };
 
@@ -21092,6 +21114,14 @@ export const proto = $root.proto = (() => {
                 d.testIsolationId = o.bytes === String ? $util.base64.encode(m.testIsolationId, 0, m.testIsolationId.length) : o.bytes === Array ? Array.prototype.slice.call(m.testIsolationId) : m.testIsolationId;
                 if (o.oneofs)
                     d._testIsolationId = "testIsolationId";
+            }
+            if (m.messageSts != null && m.hasOwnProperty("messageSts")) {
+                if (typeof m.messageSts === "number")
+                    d.messageSts = o.longs === String ? String(m.messageSts) : m.messageSts;
+                else
+                    d.messageSts = o.longs === String ? longToString(m.messageSts, false) : o.longs === Number ? longToNumber(m.messageSts, false) : m.messageSts;
+                if (o.oneofs)
+                    d._messageSts = "messageSts";
             }
             return d;
         };
