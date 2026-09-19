@@ -1,6 +1,6 @@
 /* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
 import { Boom } from '@hapi/boom';
-import { expandAppStateKeys } from 'whatsapp-rust-bridge';
+import { expandAppStateKeys } from '@rexxhayanasi/wangcap-id-bridge';
 import { proto } from '../../WAProto/index.js';
 import { GroupHistoryToggleMode } from '../Types/GroupMetadata.js';
 import { LabelAssociationType } from '../Types/LabelAssociation.js';

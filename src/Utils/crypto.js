@@ -2,7 +2,7 @@
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto';
 import * as curve from 'libsignal/src/curve.js';
 import { KEY_BUNDLE_TYPE } from '../Defaults/index.js';
-export { md5, hkdf } from 'whatsapp-rust-bridge';
+export { md5, hkdf } from '@rexxhayanasi/wangcap-id-bridge';
 
 const { subtle } = globalThis.crypto;
 
