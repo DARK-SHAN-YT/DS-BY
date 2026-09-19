@@ -4130,6 +4130,23 @@ await sock.groupJoinApprovalMode(groupJid, 'on')
 
 `groupMemberAddMode` bernilai `admin_add` atau `all_member_add`. `groupJoinApprovalMode` bernilai `on` atau `off`; kalau aktif, orang yang memakai link undangan mendarat di antrean permintaan, bukan langsung di grupnya.
 
+### Toggle Riwayat Grup
+
+WA Web revisi terbaru menambah app-state action `groupHistoryToggleAction` (apakah riwayat pesan lama dibagikan ke anggota baru). Di revisi ini WhatsApp Web baru punya sisi **terima**-nya — belum ada flow kirim — jadi fork mendecode-nya dan meneruskan lewat event `groups.update`:
+
+```js
+import { GroupHistoryToggleMode } from '@rexxhayanasi/elaina-baileys'
+// GroupHistoryToggleMode = { DEFAULT: 0, ON: 1, OFF: 2 }
+
+sock.ev.on('groups.update', ([update]) => {
+  if (update.groupHistoryToggleMode !== undefined) {
+    console.log(update.id, GroupHistoryToggleMode[update.groupHistoryToggleMode])
+  }
+})
+```
+
+Ketika kamu (atau perangkat tertaut lain) mengubah setelan ini, action-nya tersinkron dan bot menerima `{ id, groupHistoryToggleMode }`. Setter khusus akan ditambahkan begitu WA Web merilis jalur kirimnya, supaya index app-state-nya pasti benar dan tidak merusak hash.
+
 ### Antrean Permintaan Masuk
 
 ```js

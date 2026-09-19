@@ -2,6 +2,7 @@
 import { Boom } from '@hapi/boom';
 import { expandAppStateKeys } from 'whatsapp-rust-bridge';
 import { proto } from '../../WAProto/index.js';
+import { GroupHistoryToggleMode } from '../Types/GroupMetadata.js';
 import { LabelAssociationType } from '../Types/LabelAssociation.js';
 import { getBinaryNodeChild, getBinaryNodeChildren, isJidGroup, jidNormalizedUser } from '../WABinary/index.js';
 import { aesDecrypt, aesEncrypt, hmacSign } from './crypto.js';
@@ -816,6 +817,14 @@ export const processSyncAction = (syncAction, ev, me, initialSyncOpts, logger) =
             setting: 'channelsPersonalisedRecommendation',
             value: action.privacySettingChannelsPersonalisedRecommendationAction
         });
+    }
+    else if (action?.groupHistoryToggleAction) {
+        ev.emit('groups.update', [
+            {
+                id,
+                groupHistoryToggleMode: action.groupHistoryToggleAction.groupHistoryToggleMode ?? GroupHistoryToggleMode.DEFAULT
+            }
+        ]);
     }
     else {
         logger?.debug({ syncAction, id }, 'unprocessable update');

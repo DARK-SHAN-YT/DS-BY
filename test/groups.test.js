@@ -6,6 +6,8 @@ import { toNewsletterUserSettingInput, toNewsletterServerIds } from '../src/Sock
 import { QueryIds, XWAPaths } from '../src/Types/index.js';
 import { EventEmitter } from 'node:events';
 import { parseNewsletterStatusAck, waitForNewsletterStatusServerId } from '../src/Utils/newsletter-status.js';
+import { processSyncAction } from '../src/Utils/chat-utils.js';
+import { GroupHistoryToggleMode } from '../src/Types/index.js';
 
 test('group-metadata', async () => {
     const node = (addressingMode, participants) => ({
@@ -277,4 +279,28 @@ test('newsletter-status-server-id', async () => {
         sock.ws.emit('CB:status', { tag: 'status', attrs: { from: JID, id: ID, server_id: '176' } });
         assert.equal((await pending).serverId, 176);
     }
+});
+
+test('group-history-toggle-sync-action', () => {
+    assert.deepEqual(
+        { DEFAULT: GroupHistoryToggleMode.DEFAULT, ON: GroupHistoryToggleMode.ON, OFF: GroupHistoryToggleMode.OFF },
+        { DEFAULT: 0, ON: 1, OFF: 2 }
+    );
+    const collect = (mode) => {
+        const events = [];
+        const ev = { emit: (name, data) => events.push([name, data]) };
+        processSyncAction(
+            { syncAction: { value: { groupHistoryToggleAction: { groupHistoryToggleMode: mode } } }, index: ['groupHistoryToggle', '12345@g.us'] },
+            ev,
+            { id: 'me@s.whatsapp.net' },
+            undefined,
+            { debug() {}, trace() {} }
+        );
+        return events;
+    };
+    const onEvents = collect(GroupHistoryToggleMode.ON);
+    assert.equal(onEvents.length, 1);
+    assert.deepEqual(onEvents[0], ['groups.update', [{ id: '12345@g.us', groupHistoryToggleMode: 1 }]]);
+    const defEvents = collect(undefined);
+    assert.deepEqual(defEvents[0], ['groups.update', [{ id: '12345@g.us', groupHistoryToggleMode: GroupHistoryToggleMode.DEFAULT }]]);
 });
