@@ -3879,6 +3879,7 @@ export namespace proto {
         }
 
         interface IExternalAdReplyInfo {
+            productId?: (string|null);
             containsCtwaFlowsAutoLabel?: (boolean|null);
             title?: (string|null);
             body?: (string|null);
@@ -3915,6 +3916,7 @@ export namespace proto {
         }
 
         class ExternalAdReplyInfo implements IExternalAdReplyInfo {
+            public productId?: (string|null);
             public containsCtwaFlowsAutoLabel?: (boolean|null);
             constructor(p?: proto.ContextInfo.IExternalAdReplyInfo);
             public title?: (string|null);
@@ -13503,6 +13505,7 @@ export namespace proto {
     }
 
     interface ISyncActionValue {
+        groupHistoryToggleAction?: (proto.SyncActionValue.IGroupHistoryToggleAction|null);
         bubbleLockMessageAction?: (proto.SyncActionValue.IBubbleLockMessageAction|null);
         labelSublistAction?: (proto.SyncActionValue.ILabelSublistAction|null);
         deviceCapabilitiesV2?: (proto.IDeviceCapabilities|null);
@@ -13593,6 +13596,7 @@ export namespace proto {
     }
 
     class SyncActionValue implements ISyncActionValue {
+        public groupHistoryToggleAction?: (proto.SyncActionValue.IGroupHistoryToggleAction|null);
         public bubbleLockMessageAction?: (proto.SyncActionValue.IBubbleLockMessageAction|null);
         public labelSublistAction?: (proto.SyncActionValue.ILabelSublistAction|null);
         public deviceCapabilitiesV2?: (proto.IDeviceCapabilities|null);
@@ -13691,6 +13695,24 @@ export namespace proto {
     }
 
     namespace SyncActionValue {
+        interface IGroupHistoryToggleAction {
+            groupHistoryToggleMode?: (number|null);
+        }
+
+        class GroupHistoryToggleAction implements IGroupHistoryToggleAction {
+            constructor(p?: proto.SyncActionValue.IGroupHistoryToggleAction);
+            public groupHistoryToggleMode?: (number|null);
+            public _groupHistoryToggleMode?: "groupHistoryToggleMode";
+            public static create(properties?: proto.SyncActionValue.IGroupHistoryToggleAction): proto.SyncActionValue.GroupHistoryToggleAction;
+            public static encode(m: proto.SyncActionValue.IGroupHistoryToggleAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.GroupHistoryToggleAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.GroupHistoryToggleAction;
+            public static toObject(m: proto.SyncActionValue.GroupHistoryToggleAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+
         interface IBusinessFolderActivationAction {
             activated?: (boolean|null);
         }

@@ -27025,6 +27025,7 @@ export const proto = $root.proto = (() => {
             ExternalAdReplyInfo.prototype.agmHeaderInteractionStrategy = null;
 
             ExternalAdReplyInfo.prototype.containsCtwaFlowsAutoLabel = null;
+            ExternalAdReplyInfo.prototype.productId = null;
             let $oneOfFields;
 
             // Virtual OneOf for proto3 optional field
@@ -27224,6 +27225,11 @@ export const proto = $root.proto = (() => {
                 set: $util.oneOfSetter($oneOfFields)
             });
 
+            Object.defineProperty(ExternalAdReplyInfo.prototype, "_productId", {
+                get: $util.oneOfGetter($oneOfFields = ["productId"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
             ExternalAdReplyInfo.create = function create(properties) {
                 return new ExternalAdReplyInfo(properties);
             };
@@ -27297,6 +27303,8 @@ export const proto = $root.proto = (() => {
                     w.uint32(256).int32(m.agmHeaderInteractionStrategy);
                 if (m.containsCtwaFlowsAutoLabel != null && Object.hasOwnProperty.call(m, "containsCtwaFlowsAutoLabel"))
                     w.uint32(264).bool(m.containsCtwaFlowsAutoLabel);
+                if (m.productId != null && Object.hasOwnProperty.call(m, "productId"))
+                    w.uint32(274).string(m.productId);
                 return w;
             };
 
@@ -27443,6 +27451,10 @@ export const proto = $root.proto = (() => {
                         }
                     case 33: {
                             m.containsCtwaFlowsAutoLabel = r.bool();
+                            break;
+                        }
+                    case 34: {
+                            m.productId = r.string();
                             break;
                         }
                     default:
@@ -27592,6 +27604,9 @@ export const proto = $root.proto = (() => {
                 }
                 if (d.containsCtwaFlowsAutoLabel != null) {
                     m.containsCtwaFlowsAutoLabel = Boolean(d.containsCtwaFlowsAutoLabel);
+                }
+                if (d.productId != null) {
+                    m.productId = String(d.productId);
                 }
                 return m;
             };
@@ -27764,6 +27779,11 @@ export const proto = $root.proto = (() => {
                     d.containsCtwaFlowsAutoLabel = m.containsCtwaFlowsAutoLabel;
                     if (o.oneofs)
                         d._containsCtwaFlowsAutoLabel = "containsCtwaFlowsAutoLabel";
+                }
+                if (m.productId != null && m.hasOwnProperty("productId")) {
+                    d.productId = m.productId;
+                    if (o.oneofs)
+                        d._productId = "productId";
                 }
                 return d;
             };
@@ -97669,6 +97689,7 @@ export const proto = $root.proto = (() => {
         SyncActionValue.prototype.sharedDeviceAllowlistAction = null;
         SyncActionValue.prototype.contactManagerMetadataAction = null;
         SyncActionValue.prototype.businessFolderActivationAction = null;
+        SyncActionValue.prototype.groupHistoryToggleAction = null;
         let $oneOfFields;
 
         // Virtual OneOf for proto3 optional field
@@ -98186,6 +98207,11 @@ export const proto = $root.proto = (() => {
             set: $util.oneOfSetter($oneOfFields)
         });
 
+        Object.defineProperty(SyncActionValue.prototype, "_groupHistoryToggleAction", {
+            get: $util.oneOfGetter($oneOfFields = ["groupHistoryToggleAction"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
         SyncActionValue.create = function create(properties) {
             return new SyncActionValue(properties);
         };
@@ -98367,6 +98393,8 @@ export const proto = $root.proto = (() => {
                 $root.proto.SyncActionValue.ContactManagerMetadataAction.encode(m.contactManagerMetadataAction, w.uint32(762).fork()).ldelim();
             if (m.businessFolderActivationAction != null && Object.hasOwnProperty.call(m, "businessFolderActivationAction"))
                 $root.proto.SyncActionValue.BusinessFolderActivationAction.encode(m.businessFolderActivationAction, w.uint32(770).fork()).ldelim();
+            if (m.groupHistoryToggleAction != null && Object.hasOwnProperty.call(m, "groupHistoryToggleAction"))
+                $root.proto.SyncActionValue.GroupHistoryToggleAction.encode(m.groupHistoryToggleAction, w.uint32(778).fork()).ldelim();
             return w;
         };
 
@@ -98729,6 +98757,10 @@ export const proto = $root.proto = (() => {
                     }
                 case 96: {
                         m.businessFolderActivationAction = $root.proto.SyncActionValue.BusinessFolderActivationAction.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 97: {
+                        m.groupHistoryToggleAction = $root.proto.SyncActionValue.GroupHistoryToggleAction.decode(r, r.uint32(), undefined, n + 1);
                         break;
                     }
                 default:
@@ -99187,6 +99219,11 @@ export const proto = $root.proto = (() => {
                     throw TypeError(".proto.businessFolderActivationAction: object expected");
                 m.businessFolderActivationAction = $root.proto.SyncActionValue.BusinessFolderActivationAction.fromObject(d.businessFolderActivationAction, n + 1);
             }
+            if (d.groupHistoryToggleAction != null) {
+                if (typeof d.groupHistoryToggleAction !== "object")
+                    throw TypeError(".proto.groupHistoryToggleAction: object expected");
+                m.groupHistoryToggleAction = $root.proto.SyncActionValue.GroupHistoryToggleAction.fromObject(d.groupHistoryToggleAction, n + 1);
+            }
             return m;
         };
 
@@ -99631,6 +99668,11 @@ export const proto = $root.proto = (() => {
                 d.businessFolderActivationAction = $root.proto.SyncActionValue.BusinessFolderActivationAction.toObject(m.businessFolderActivationAction, o);
                 if (o.oneofs)
                     d._businessFolderActivationAction = "businessFolderActivationAction";
+            }
+            if (m.groupHistoryToggleAction != null && m.hasOwnProperty("groupHistoryToggleAction")) {
+                d.groupHistoryToggleAction = $root.proto.SyncActionValue.GroupHistoryToggleAction.toObject(m.groupHistoryToggleAction, o);
+                if (o.oneofs)
+                    d._groupHistoryToggleAction = "groupHistoryToggleAction";
             }
             return d;
         };
@@ -113009,6 +113051,101 @@ export const proto = $root.proto = (() => {
             };
 
             return BusinessFolderActivationAction;
+        })();
+
+        SyncActionValue.GroupHistoryToggleAction = (function() {
+
+            function GroupHistoryToggleAction(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            GroupHistoryToggleAction.prototype.groupHistoryToggleMode = null;
+
+            let $oneOfFields;
+
+            Object.defineProperty(GroupHistoryToggleAction.prototype, "_groupHistoryToggleMode", {
+                get: $util.oneOfGetter($oneOfFields = ["groupHistoryToggleMode"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            GroupHistoryToggleAction.create = function create(properties) {
+                return new GroupHistoryToggleAction(properties);
+            };
+
+            GroupHistoryToggleAction.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.groupHistoryToggleMode != null && Object.hasOwnProperty.call(m, "groupHistoryToggleMode"))
+                    w.uint32(8).int32(m.groupHistoryToggleMode);
+                return w;
+            };
+
+            GroupHistoryToggleAction.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.SyncActionValue.GroupHistoryToggleAction();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.groupHistoryToggleMode = r.int32();
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            GroupHistoryToggleAction.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.SyncActionValue.GroupHistoryToggleAction)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.SyncActionValue.GroupHistoryToggleAction();
+                if (d.groupHistoryToggleMode != null) {
+                    m.groupHistoryToggleMode = d.groupHistoryToggleMode >>> 0;
+                }
+                return m;
+            };
+
+            GroupHistoryToggleAction.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (m.groupHistoryToggleMode != null && m.hasOwnProperty("groupHistoryToggleMode")) {
+                    d.groupHistoryToggleMode = m.groupHistoryToggleMode;
+                    if (o.oneofs)
+                        d._groupHistoryToggleMode = "groupHistoryToggleMode";
+                }
+                return d;
+            };
+
+            GroupHistoryToggleAction.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            GroupHistoryToggleAction.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.SyncActionValue.GroupHistoryToggleAction";
+            };
+
+            return GroupHistoryToggleAction;
         })();
 
         return SyncActionValue;
