@@ -16,7 +16,7 @@
 <header class="topbar">
   <button class="menu-toggle" type="button" aria-label="Menu" data-menu>☰</button>
   <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>Elaina Baileys</span></a>
-  <span class="version">v1.3.10</span>
+  <span class="version">v1.4.0</span>
   <div class="topbar-actions">
     <a class="lang" href="../id/index.html">ID</a>
     <button class="theme" type="button" data-theme-toggle aria-label="Theme">◐</button>
@@ -27,7 +27,7 @@
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html" class="active">Overview</a><a href="./getting-started.html">Getting started</a><a href="./messages.html">Messages</a><a href="./builder.html">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Groups</a><a href="./examples.html">Examples</a><a href="./api.html">API reference</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina" rel="noreferrer">npm</a>
+      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
       <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
@@ -41,10 +41,10 @@
 <h2 id="where-to-start">Where to start<a class="anchor" href="#where-to-start" aria-label="link">#</a></h2>
 <ul><li><a href="./getting-started.html">Getting started</a> — install, connect, pair a device</li><li><a href="./messages.html">Messages</a> — receive, read and send</li><li><a href="./builder.html">MessageBuilder</a> — interactive messages</li><li><a href="./newsletter.html">Newsletter</a> — channels</li><li><a href="./groups.html">Groups</a> — groups and communities</li><li><a href="./examples.html">Examples</a> — complete bots</li><li><a href="./api.html">API reference</a> — every method, generated from the code</li></ul>
 <h2 id="install">Install<a class="anchor" href="#install" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @rexxhayanasi/elaina</code></pre></div>
+<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @rexxhayanasi/elaina-baileys</code></pre></div>
 <p>Needs Node.js 22 or newer. The package is ESM-first, so use <code>import</code> rather than <code>require()</code>.</p>
 <h2 id="the-shortest-thing-that-works">The shortest thing that works<a class="anchor" href="#the-shortest-thing-that-works" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
 
 const { state, saveCreds } = await useMultiFileAuthState('./session')
 const sock = makeWASocket({ auth: state })

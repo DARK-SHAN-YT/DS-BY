@@ -16,7 +16,7 @@
 <header class="topbar">
   <button class="menu-toggle" type="button" aria-label="Menu" data-menu>☰</button>
   <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>Elaina Baileys</span></a>
-  <span class="version">v1.3.10</span>
+  <span class="version">v1.4.0</span>
   <div class="topbar-actions">
     <a class="lang" href="../en/getting-started.html">EN</a>
     <button class="theme" type="button" data-theme-toggle aria-label="Theme">◐</button>
@@ -27,7 +27,7 @@
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html">Ringkasan</a><a href="./getting-started.html" class="active">Mulai cepat</a><a href="./messages.html">Pesan</a><a href="./builder.html">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Grup</a><a href="./examples.html">Contoh</a><a href="./api.html">Referensi API</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina" rel="noreferrer">npm</a>
+      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
       <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
@@ -38,16 +38,16 @@
 <ul><li>Node.js <strong>22 atau lebih baru</strong> (disarankan 24)</li><li>npm</li><li>Akun WhatsApp untuk dipasangkan</li></ul>
 <div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>node -v</code></pre></div>
 <h2 id="pemasangan">Pemasangan<a class="anchor" href="#pemasangan" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @rexxhayanasi/elaina</code></pre></div>
+<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @rexxhayanasi/elaina-baileys</code></pre></div>
 <p>Paket ini ESM-first, jadi <code>package.json</code> kamu butuh <code>&quot;type&quot;: &quot;module&quot;</code>:</p>
 <div class="code-block"><span class="code-lang">json</span><button class="copy" type="button" data-copy>copy</button><pre><code>{
   &quot;type&quot;: &quot;module&quot;,
   &quot;dependencies&quot;: {
-    &quot;@rexxhayanasi/elaina&quot;: &quot;latest&quot;
+    &quot;@rexxhayanasi/elaina-baileys&quot;: &quot;latest&quot;
   }
 }</code></pre></div>
 <h2 id="import">Import<a class="anchor" href="#import" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket from '@rexxhayanasi/elaina'</code></pre></div>
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket from '@rexxhayanasi/elaina-baileys'</code></pre></div>
 <p>Sisanya datang dari entry point yang sama:</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, {
   useMultiFileAuthState,
@@ -58,14 +58,14 @@
   AIRich,
   MessageBuilder,
   MB
-} from '@rexxhayanasi/elaina'</code></pre></div>
+} from '@rexxhayanasi/elaina-baileys'</code></pre></div>
 <div class="alert alert-note"><span class="alert-label">note</span><p>MessageBuilder sudah terintegrasi. Kamu tidak perlu memasang <code>baileys-mbuilder</code> terpisah.</p></div>
 <h2 id="koneksi-yang-tahan-restart">Koneksi yang tahan restart<a class="anchor" href="#koneksi-yang-tahan-restart" aria-label="link">#</a></h2>
 <p>Bagian pentingnya bukan socket-nya — tapi menyambung ulang saat WhatsApp memutus, dan tahu kapan <em>tidak</em> boleh menyambung ulang.</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason
-} from '@rexxhayanasi/elaina'
+} from '@rexxhayanasi/elaina-baileys'
 import pino from 'pino'
 
 async function startSock() {
