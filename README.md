@@ -763,6 +763,60 @@ node script/testpairing.js 6281234567890 --check-only
 
 ---
 
+## 🔎 Info Nomor
+
+`checkNumberInfo` menanyakan endpoint `/v2/exist` milik server registrasi WhatsApp dan melaporkan perangkat utama, email pemulihan (sudah dimasker server), dan status larangan sebuah nomor. Permintaannya murni HTTP — tidak butuh koneksi socket, tidak pernah meminta kode, dan memakai bundel kunci Signal sekali pakai, jadi kunci sesi socket tidak pernah dikirim.
+
+```js
+const result = await sock.checkNumberInfo('94761234304')
+console.log(JSON.stringify(result, null, 2))
+```
+
+```js
+{
+  "data": {
+    "number": "76****304",
+    "countryCode": "94",
+    "status": "Safe",
+    "banned": false,
+    "registered": true,
+    "info": {
+      "device": "Motorola moto g05",
+      "email": "k*****************5@gmail.com",
+      "lid": "98765432109876@s.whatsapp.net",
+      "reason": null,
+      "violationType": null,
+      "violatedPolicy": null,
+      "violationReason": null,
+      "isDeviceTrusted": true,
+      "inAppBanAppeal": null,
+      "retryAfter": null,
+      "serverStatus": "ok"
+    }
+  }
+}
+```
+
+`status` dirangkum dari jawaban server: `Safe` (terdaftar, tidak dilarang), `Banned` (alasan `blocked`, atau ada `violation_type`/`violated_policy`/`custom_block_screen`), `Not Registered` (alasan `incorrect`), dan `Unknown` untuk sisanya. Nomor dimasker menjadi dua digit pertama dan tiga terakhir; email yang terlihat hanyalah versi yang sudah dimasker server — tidak pernah disajikan utuh.
+
+Nomornya diterima dalam format internasional dan kode negaranya dipisahkan otomatis; `+94 76 123 4304`, `94761234304`, dan `940761234304` semuanya permintaan yang sama. Kalau pemisahan otomatisnya salah, berikan `countryCode` eksplisit:
+
+```js
+const result = await sock.checkNumberInfo('0761234304', { countryCode: 94 })
+```
+
+Opsi lain: `language` dan `locale` (bawaan `en`/`US`), `userAgent` (bawaan `WhatsApp/2.26.37.71 Android/15 Device/Samsung-SM-S928B` — server menolak `platform` kalau User-Agent tidak dikenalinya), dan `timeoutMs` (bawaan 20000).
+
+Fungsinya juga bisa dipakai langsung tanpa socket:
+
+```bash
+node script/testchecknumber.js 6281234567890
+```
+
+Field `device` dan `email` hanya diisi untuk akun yang terdaftar; keduanya dibaca dari `wa_old_device_name` dan `email` pada jawaban `/v2/exist`, sama seperti yang diparse klien Android asli.
+
+---
+
 ## 📩 Menerima Pesan
 
 ```js

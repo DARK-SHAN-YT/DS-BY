@@ -7,7 +7,7 @@ import { proto } from '../../WAProto/index.js';
 import { DEF_CALLBACK_PREFIX, DEF_TAG_PREFIX, INITIAL_PREKEY_COUNT, MIN_PREKEY_COUNT, NOISE_WA_HEADER, PROCESSABLE_HISTORY_TYPES, TimeMs, UPLOAD_TIMEOUT, PAIRING_RESPONSE_GRACE_MS } from '../Defaults/index.js';
 import { NewChatMessageCappingStatusType, QueryIds, ReachoutTimelockEnforcementType } from '../Types/index.js';
 import { DisconnectReason, XWAPaths } from '../Types/index.js';
-import { addTransactionCapability, aesEncryptCTR, bindWaitForConnectionUpdate, buildPairingQRData, bytesToCrockford, configureSuccessfulPairing, Curve, derivePairingCodeKey, generateLoginNode, generateMdTagPrefix, generateRegistrationNode, getCodeFromWSError, getCompanionPlatformId, getErrorCodeFromStreamError, getNextPreKeysNode, makeEventBuffer, makeNoiseHandler, promiseTimeout, signedKeyPair, xmppSignedPreKey } from '../Utils/index.js';
+import { addTransactionCapability, aesEncryptCTR, bindWaitForConnectionUpdate, buildPairingQRData, bytesToCrockford, checkNumberInfo, configureSuccessfulPairing, Curve, derivePairingCodeKey, generateLoginNode, generateMdTagPrefix, generateRegistrationNode, getCodeFromWSError, getCompanionPlatformId, getErrorCodeFromStreamError, getNextPreKeysNode, makeEventBuffer, makeNoiseHandler, promiseTimeout, signedKeyPair, xmppSignedPreKey } from '../Utils/index.js';
 import { assertNodeErrorFree, binaryNodeToString, encodeBinaryNode, getAllBinaryNodeChildren, getBinaryNodeChild, getBinaryNodeChildren, isLidUser, jidDecode, jidEncode, jidNormalizedUser, S_WHATSAPP_NET } from '../WABinary/index.js';
 import { BinaryInfo } from '../WAM/BinaryInfo.js';
 import { USyncQuery, USyncUser } from '../WAUSync/index.js';
@@ -1064,6 +1064,7 @@ export const makeSocket = (config) => {
         rotateSignedPreKey,
         requestPairingCode,
         cancelPairingCode,
+        checkNumberInfo,
         updateServerTimeOffset,
         sendUnifiedSession,
         wamBuffer: publicWAMBuffer,

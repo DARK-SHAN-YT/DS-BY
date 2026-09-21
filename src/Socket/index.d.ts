@@ -548,6 +548,7 @@ declare function makeWASocket(config: any): {
     rotateSignedPreKey: () => Promise<void>;
     requestPairingCode: (phoneNumber: any, customPairingCode: any) => Promise<any>;
     cancelPairingCode: () => boolean;
+    checkNumberInfo: (phoneNumber: any, opts: any) => Promise<any>;
     updateServerTimeOffset: ({ attrs }: {
         attrs: any;
     }) => void;
