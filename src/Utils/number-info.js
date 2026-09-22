@@ -125,24 +125,26 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
         && (reason === 'blocked' || Boolean(json.violation_type) || Boolean(json.violated_policy) || Boolean(json.custom_block_screen));
     const registered = status === 'ok';
     const label = banned ? 'Banned' : registered ? 'Safe' : reason === 'incorrect' ? 'Not Registered' : 'Unknown';
+    const appealToken = json.appeal_token || null;
+    const canAppeal = typeof json.in_app_ban_appeal === 'number' ? json.in_app_ban_appeal !== 0 : null;
     return {
         data: {
             number: maskNationalNumber(nationalNumber),
             countryCode,
             status: label,
-            banned,
             registered,
+            banned,
+            reason,
+            violationType: json.violation_type || null,
+            canAppeal,
+            appealToken,
             info: {
                 device: json.wa_old_device_name || null,
                 email: json.email || null,
                 lid: json.lid || null,
-                reason,
-                violationType: json.violation_type || null,
                 violatedPolicy: json.violated_policy || null,
                 violationReason: json.violation_reason || null,
-                appealToken: json.appeal_token || null,
                 isDeviceTrusted: typeof json.is_device_trusted === 'boolean' ? json.is_device_trusted : null,
-                inAppBanAppeal: typeof json.in_app_ban_appeal === 'number' ? json.in_app_ban_appeal : null,
                 retryAfter: json.retry_after ?? null,
                 serverStatus: status ?? null
             }
