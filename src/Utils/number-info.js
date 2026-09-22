@@ -140,6 +140,7 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
                 violationType: json.violation_type || null,
                 violatedPolicy: json.violated_policy || null,
                 violationReason: json.violation_reason || null,
+                appealToken: json.appeal_token || null,
                 isDeviceTrusted: typeof json.is_device_trusted === 'boolean' ? json.is_device_trusted : null,
                 inAppBanAppeal: typeof json.in_app_ban_appeal === 'number' ? json.in_app_ban_appeal : null,
                 retryAfter: json.retry_after ?? null,
