@@ -1,6 +1,9 @@
 /* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
 import { Boom } from '@hapi/boom';
 import { createHash, randomBytes, randomUUID } from 'crypto';
+import http from 'http';
+import https from 'https';
+import tls from 'tls';
 import { initAuthCreds } from './auth-utils.js';
 
 const CALLING_CODES = new Set('1,7,20,27,30,31,32,33,34,36,39,40,41,43,44,45,46,47,48,49,51,52,53,54,55,56,57,58,60,61,62,63,64,65,66,81,82,84,86,90,91,92,93,94,95,98,211,212,213,216,218,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,248,249,250,251,252,253,254,255,256,257,258,260,261,262,263,264,265,266,267,268,269,290,291,297,298,299,350,351,352,353,354,355,356,357,358,359,370,371,372,373,374,375,376,377,378,380,381,382,383,385,386,387,389,420,421,423,500,501,502,503,504,505,506,507,508,509,590,591,592,593,594,595,596,597,598,599,670,672,673,674,675,676,677,678,679,680,681,682,683,685,686,687,688,689,690,691,692,850,852,853,855,856,880,886,960,961,962,963,964,965,966,967,968,970,971,972,973,974,975,976,977,992,993,994,995,996,998'.split(','));
@@ -42,6 +45,51 @@ export const maskNationalNumber = (nationalNumber) => {
 const toBase64Url = (bytes) => Buffer.from(bytes).toString('base64url');
 const toPercentHex = (bytes) => Buffer.from(bytes).toString('hex').match(/.{1,2}/g).map(byte => `%${byte.toLowerCase()}`).join('');
 const urlencode = (value) => String(value).replace(/-/g, '%2d').replace(/_/g, '%5f').replace(/~/g, '%7e');
+
+const probeViaProxy = (url, headers, proxy, timeoutMs) => new Promise((resolve, reject) => {
+    const target = new URL(url);
+    const proxyUrl = new URL(proxy);
+    const auth = proxyUrl.username
+        ? `Basic ${Buffer.from(`${decodeURIComponent(proxyUrl.username)}:${decodeURIComponent(proxyUrl.password)}`).toString('base64')}`
+        : undefined;
+    const connect = http.request({
+        host: proxyUrl.hostname,
+        port: Number(proxyUrl.port) || 80,
+        method: 'CONNECT',
+        path: `${target.hostname}:443`,
+        headers: { Host: `${target.hostname}:443`, ...(auth ? { 'Proxy-Authorization': auth } : {}) }
+    });
+    connect.setTimeout(timeoutMs, () => connect.destroy(new Error('proxy connect timed out')));
+    connect.on('error', reject);
+    connect.on('connect', (response, socket) => {
+        if (response.statusCode !== 200) {
+            socket.destroy();
+            reject(new Boom(`proxy refused CONNECT with ${response.statusCode}`, { statusCode: 502, data: { proxy } }));
+            return;
+        }
+        const request = https.request({
+            createConnection: () => tls.connect({ socket, servername: target.hostname }),
+            host: target.hostname,
+            port: 443,
+            path: `${target.pathname}${target.search}`,
+            method: 'GET',
+            headers,
+            timeout: timeoutMs
+        });
+        request.on('error', (error) => {
+            socket.destroy();
+            reject(error);
+        });
+        request.on('response', (proxied) => {
+            const chunks = [];
+            proxied.on('data', chunk => chunks.push(chunk));
+            proxied.on('end', () => resolve({ status: proxied.statusCode, text: Buffer.concat(chunks).toString('utf8') }));
+            proxied.on('error', reject);
+        });
+        request.end();
+    });
+    connect.end();
+});
 
 /**
  * The /v2/code probe mirrors the Android registration request (the ban
@@ -110,26 +158,49 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
         .filter(([, value]) => value !== null && value !== undefined)
         .map(([key, value]) => `${key}=${urlencode(value)}`)
         .join('&');
-    let response;
-    try {
-        response = await fetch(`${CODE_ENDPOINT}?${qs}`, {
-            headers: {
-                'Accept': 'application/json',
-                'User-Agent': opts.userAgent ?? DEFAULT_REGISTRATION_UA
-            },
-            signal: AbortSignal.timeout(opts.timeoutMs ?? 20000)
-        });
-    }
-    catch (error) {
-        throw new Boom(`could not reach the registration server: ${error?.message ?? error}`, { statusCode: 502, data: { phoneNumber, cause: error } });
-    }
-    const text = await response.text();
+    const requestUrl = `${CODE_ENDPOINT}?${qs}`;
+    const headers = {
+        'Accept': 'application/json',
+        'User-Agent': opts.userAgent ?? DEFAULT_REGISTRATION_UA
+    };
+    const timeoutMs = opts.timeoutMs ?? 20000;
+    const proxyPool = opts.proxies ?? (opts.proxy ? [opts.proxy] : []);
+    const maxAttempts = proxyPool.length ? Math.max(1, opts.retries ?? 5) : 1;
+    const throttled = new Set(['no_routes', 'temporarily_unavailable']);
     let json;
-    try {
-        json = JSON.parse(text);
-    }
-    catch {
-        throw new Boom(`registration server returned HTTP ${response.status} with a non-JSON body`, { statusCode: response.status >= 400 ? response.status : 502, data: { phoneNumber, body: text.slice(0, 512) } });
+    let attempts = 0;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        attempts = attempt + 1;
+        const proxy = proxyPool.length ? proxyPool[attempt % proxyPool.length] : undefined;
+        let response;
+        try {
+            response = proxy
+                ? await probeViaProxy(requestUrl, headers, proxy, timeoutMs)
+                : await fetch(requestUrl, { headers, signal: AbortSignal.timeout(timeoutMs) });
+        }
+        catch (error) {
+            if (attempt + 1 >= maxAttempts) {
+                throw new Boom(`could not reach the registration server: ${error?.message ?? error}`, { statusCode: 502, data: { phoneNumber, cause: error } });
+            }
+            await new Promise(resolve => setTimeout(resolve, 500));
+            continue;
+        }
+        const text = typeof response.text === 'string' ? response.text : await response.text();
+        try {
+            json = JSON.parse(text);
+        }
+        catch {
+            throw new Boom(`registration server returned HTTP ${response.status} with a non-JSON body`, { statusCode: response.status >= 400 ? response.status : 502, data: { phoneNumber, body: text.slice(0, 512) } });
+        }
+        const incomplete = method === 'wa_old'
+            && ['ok', 'sent'].includes(json.status ?? '')
+            && !json.wa_old_device_name
+            && !json.email;
+        if (attempt + 1 < maxAttempts && (throttled.has(json.reason ?? '') || (opts.retryUntilDeviceInfo !== false && incomplete))) {
+            await new Promise(resolve => setTimeout(resolve, 750));
+            continue;
+        }
+        break;
     }
     const status = json.status;
     const reason = json.reason ?? null;
@@ -155,6 +226,7 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
             violationType: json.violation_type || null,
             canAppeal,
             appealToken,
+            attempts,
             info: {
                 device: json.wa_old_device_name || null,
                 email: json.email || null,
