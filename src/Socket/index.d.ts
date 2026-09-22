@@ -549,6 +549,7 @@ declare function makeWASocket(config: any): {
     requestPairingCode: (phoneNumber: any, customPairingCode: any) => Promise<any>;
     cancelPairingCode: () => boolean;
     checkNumberInfo: (phoneNumber: any, opts: any) => Promise<any>;
+    createEnforcementAppeal: (reason: any, details: any) => Promise<any>;
     updateServerTimeOffset: ({ attrs }: {
         attrs: any;
     }) => void;

@@ -1015,8 +1015,7 @@ export const makeSocket = (config) => {
     };
 
     const fetchNewChatMessageCap = async () => {
-        const response = await executeWMexQuery({ input: { type: 'INDIVIDUAL_NEW_CHAT_THREAD' } }, QueryIds.MESSAGE_CAPPING_INFO, XWAPaths.xwa2_message_capping_info, query, generateMessageTag);
-        const toNumber = (value) => {
+        const response = await executeWMexQuery({ input: { type: 'INDIVIDUAL_NEW_CHAT_THREAD' } }, QueryIds.MESSAGE_CAPPING_INFO, XWAPaths.xwa2_message_capping_info, query, generateMessageTag);        const toNumber = (value) => {
             const parsed = Number.parseInt(String(value ?? ''), 10);
             return Number.isFinite(parsed) ? parsed : undefined;
         };
@@ -1038,6 +1037,23 @@ export const makeSocket = (config) => {
             subscriptionStatus: response?.subscription_status,
             response
         };
+    };
+
+    /**
+     * CreateEnforcementAppeal is an Android persisted query
+     * (doc_id 26933630359642347 in com.whatsapp's whatsapp-android-mex
+     * persist ids), so it is not declared in QueryIds — the Web bundle this
+     * library links with does not serve it and verify:mex would reject an id
+     * it cannot find there. The appeal_token the registration responses
+     * carry is bound to the calling account server-side; the mutation only
+     * takes the appeal reason and free-form details.
+     */
+    const createEnforcementAppeal = async (reason, details) => {
+        const input = { reason };
+        if (details) {
+            input.details = details;
+        }
+        return executeWMexQuery({ input }, '26933630359642347', 'xwa2_create_enforcement_appeal', query, generateMessageTag);
     };
     return {
         type: 'md',
@@ -1065,6 +1081,7 @@ export const makeSocket = (config) => {
         requestPairingCode,
         cancelPairingCode,
         checkNumberInfo,
+        createEnforcementAppeal,
         updateServerTimeOffset,
         sendUnifiedSession,
         wamBuffer: publicWAMBuffer,
