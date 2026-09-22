@@ -164,7 +164,8 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
                 retryAfter: json.retry_after ?? null,
                 serverStatus: status ?? null,
                 method
-            }
+            },
+            raw: json
         }
     };
 };
