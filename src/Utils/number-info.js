@@ -166,7 +166,7 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
     const timeoutMs = opts.timeoutMs ?? 20000;
     const proxyPool = opts.proxies ?? (opts.proxy ? [opts.proxy] : []);
     const maxAttempts = proxyPool.length ? Math.max(1, opts.retries ?? 5) : 1;
-    const throttled = new Set(['no_routes', 'temporarily_unavailable']);
+    const throttled = new Set(['no_routes', 'temporarily_unavailable', 'too_many']);
     let json;
     let attempts = 0;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -210,7 +210,7 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
     const label = banned ? 'Banned'
         : restricted ? 'Restricted'
             : clean ? 'Safe'
-                : reason === 'temporarily_unavailable' ? 'Unavailable'
+                : ['temporarily_unavailable', 'too_recent', 'too_many'].includes(reason) ? 'Unavailable'
                     : 'Unknown';
     const appealToken = json.appeal_token || null;
     const canAppeal = typeof json.in_app_ban_appeal === 'number' ? json.in_app_ban_appeal !== 0 : null;
