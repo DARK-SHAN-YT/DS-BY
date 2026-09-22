@@ -765,7 +765,9 @@ node script/testpairing.js 6281234567890 --check-only
 
 ## 🔎 Info Nomor
 
-`checkNumberInfo` menanyakan endpoint `/v2/exist` milik server registrasi WhatsApp dan melaporkan perangkat utama, email pemulihan (sudah dimasker server), dan status larangan sebuah nomor. Permintaannya murni HTTP — tidak butuh koneksi socket, tidak pernah meminta kode, dan memakai bundel kunci Signal sekali pakai, jadi kunci sesi socket tidak pernah dikirim.
+`checkNumberInfo` men-probe `/v2/code` milik server registrasi WhatsApp dengan token registrasi yang dibangkitkan lokal (md5 rahasia per-versi + md5 versi + nomor nasional) dan bundel kunci Signal sekali pakai — tidak butuh koneksi socket dan kunci sesi tidak pernah dikirim. Dengan `method` bawaan `wa_old`, jawaban server membocorkan nama perangkat utama akun (`wa_old_device_name`) dan email pemulihannya yang sudah dimasker; nomor yang dilarang dijawab dengan `violation_type`/`appeal_token`/`in_app_ban_appeal`.
+
+Efek samping melekat pada metode probe ini (sama dengan semua alat "check wa"): WhatsApp mengirim notifikasi OTP ke nomor tersebut. Metode `sms` mengirim SMS; `wa_old` mengirim permintaan persetujuan ke perangkat yang sudah terdaftar.
 
 ```js
 const result = await sock.checkNumberInfo('94761234304')
@@ -778,26 +780,28 @@ console.log(JSON.stringify(result, null, 2))
     "number": "76****304",
     "countryCode": "94",
     "status": "Safe",
-    "banned": false,
     "registered": true,
+    "banned": false,
+    "restricted": false,
+    "reason": null,
+    "violationType": null,
+    "canAppeal": null,
+    "appealToken": null,
     "info": {
       "device": "Motorola moto g05",
       "email": "k*****************5@gmail.com",
       "lid": "98765432109876@s.whatsapp.net",
-      "reason": null,
-      "violationType": null,
       "violatedPolicy": null,
       "violationReason": null,
-      "isDeviceTrusted": true,
-      "inAppBanAppeal": null,
       "retryAfter": null,
-      "serverStatus": "ok"
+      "serverStatus": "sent",
+      "method": "wa_old"
     }
   }
 }
 ```
 
-`status` dirangkum dari jawaban server: `Safe` (terdaftar, tidak dilarang), `Banned` (alasan `blocked`, atau ada `violation_type`/`violated_policy`/`custom_block_screen`), `Not Registered` (alasan `incorrect`), dan `Unknown` untuk sisanya. Nomor dimasker menjadi dua digit pertama dan tiga terakhir; email yang terlihat hanyalah versi yang sudah dimasker server — tidak pernah disajikan utuh.
+`status` dirangkum dari jawaban server: `Banned` (ada `appeal_token`/`violation_type`), `Restricted` (`custom_block_screen` atau alasan `blocked`), `Safe` (status `sent`/`ok`), `Unavailable` (alasan `temporarily_unavailable` — server mem-throttle probe ini agresif, sekitar satu per jam per asal), dan `Unknown` untuk sisanya termasuk `no_routes`. Nomor dimasker menjadi dua digit pertama dan tiga terakhir; email yang terlihat hanyalah versi yang sudah dimasker server.
 
 Nomornya diterima dalam format internasional dan kode negaranya dipisahkan otomatis; `+94 76 123 4304`, `94761234304`, dan `940761234304` semuanya permintaan yang sama. Kalau pemisahan otomatisnya salah, berikan `countryCode` eksplisit:
 
@@ -805,7 +809,7 @@ Nomornya diterima dalam format internasional dan kode negaranya dipisahkan otoma
 const result = await sock.checkNumberInfo('0761234304', { countryCode: 94 })
 ```
 
-Opsi lain: `language` dan `locale` (bawaan `en`/`US`), `userAgent` (bawaan `WhatsApp/2.26.37.71 Android/15 Device/Samsung-SM-S928B` — server menolak `platform` kalau User-Agent tidak dikenalinya), dan `timeoutMs` (bawaan 20000).
+Opsi lain: `method` (`wa_old`/`sms`), `mcc` dan `mnc` (bawaan `510`/`10`), `language` dan `locale` (bawaan `en`/`GB`), `userAgent`, dan `timeoutMs` (bawaan 20000). Versi aplikasi yang diklaim User-Agent dijaga di `WA_VERSION` (`2.26.36.74`) — begitu server menjawab `old_version`, naikkan nilai itu.
 
 Fungsinya juga bisa dipakai langsung tanpa socket:
 
@@ -813,7 +817,7 @@ Fungsinya juga bisa dipakai langsung tanpa socket:
 node script/testchecknumber.js 6281234567890
 ```
 
-Field `device` dan `email` hanya diisi untuk akun yang terdaftar; keduanya dibaca dari `wa_old_device_name` dan `email` pada jawaban `/v2/exist`, sama seperti yang diparse klien Android asli.
+Nomor yang dilarang membawa `appealToken`; sesi milik sendiri dapat mengajukan banding lewat `createEnforcementAppeal(reason, details)`.
 
 ---
 

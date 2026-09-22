@@ -1,22 +1,24 @@
 /* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
 import { Boom } from '@hapi/boom';
-import { randomBytes, randomUUID } from 'crypto';
-import { aesEncryptGCM, Curve } from './crypto.js';
-import { encodeBigEndian } from './generics.js';
+import { createHash, randomBytes, randomUUID } from 'crypto';
 import { initAuthCreds } from './auth-utils.js';
 
 const CALLING_CODES = new Set('1,7,20,27,30,31,32,33,34,36,39,40,41,43,44,45,46,47,48,49,51,52,53,54,55,56,57,58,60,61,62,63,64,65,66,81,82,84,86,90,91,92,93,94,95,98,211,212,213,216,218,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,248,249,250,251,252,253,254,255,256,257,258,260,261,262,263,264,265,266,267,268,269,290,291,297,298,299,350,351,352,353,354,355,356,357,358,359,370,371,372,373,374,375,376,377,378,380,381,382,383,385,386,387,389,420,421,423,500,501,502,503,504,505,506,507,508,509,590,591,592,593,594,595,596,597,598,599,670,672,673,674,675,676,677,678,679,680,681,682,683,685,686,687,688,689,690,691,692,850,852,853,855,856,880,886,960,961,962,963,964,965,966,967,968,970,971,972,973,974,975,976,977,992,993,994,995,996,998'.split(','));
-const EXIST_ENDPOINT = 'https://v.whatsapp.net/v2/exist';
-export const DEFAULT_REGISTRATION_UA = 'WhatsApp/2.26.37.71 Android/15 Device/Samsung-SM-S928B';
+const CODE_ENDPOINT = 'https://v.whatsapp.net/v2/code';
 
 /**
- * Public X25519 half of the registration-server key the Android client wraps
- * the /v2/exist body with (X.HSB.A00 in com.whatsapp 2.26.37.71): an ephemeral
- * keypair is agreed with it, the urlencoded params are sealed with AES-GCM
- * under a 12-byte zero IV, and ENC=<base64url(pub||ciphertext)> replaces the
- * whole query string. Verified live against v.whatsapp.net.
+ * The registration token is an md5 over a per-version secret, the hex md5 of
+ * the app version, and the national number — same shape the Android client
+ * signs its /v2/code request with. Version 2.26.36.74 (App Store 26.36.74
+ * mapped back to the four-part scheme) is accepted as of 2026-09; when the
+ * server starts answering reason "old_version", bump WA_VERSION (and only
+ * then — the secret stays valid across version bumps). Verified live: with
+ * this token the server validates the request past its bad_token gate.
  */
-const REGISTRATION_SERVER_PUBKEY = Buffer.from('8e8c0f74c3ebc5d7a6865c6c3c843856b06121cce8ea774d22fb6f122512302d', 'hex');
+const WA_VERSION = '2.26.36.74';
+const MOBILE_TOKEN_SECRET = '0a1mLfGUIBVrMKF1RdvLI5lkRBvof6vn0fD2QRSM';
+const MOBILE_TOKEN_KEY = Buffer.from(MOBILE_TOKEN_SECRET + createHash('md5').update(WA_VERSION).digest('hex'));
+export const DEFAULT_REGISTRATION_UA = `WhatsApp/${WA_VERSION} iOS/18.2 Device/Apple-iPhone_13`;
 
 export const splitCallingCode = (phoneNumber) => {
     const digits = String(phoneNumber ?? '').replace(/\D/g, '');
@@ -38,18 +40,18 @@ export const maskNationalNumber = (nationalNumber) => {
 };
 
 const toBase64Url = (bytes) => Buffer.from(bytes).toString('base64url');
-const toPercentHex = (bytes) => [...bytes].map(byte => '%' + byte.toString(16).padStart(2, '0')).join('');
+const toPercentHex = (bytes) => Buffer.from(bytes).toString('hex').match(/.{1,2}/g).map(byte => `%${byte.toLowerCase()}`).join('');
+const urlencode = (value) => String(value).replace(/-/g, '%2d').replace(/_/g, '%5f').replace(/~/g, '%7e');
 
 /**
- * Wire format of /v2/exist per com.whatsapp 2.26.37.71 (KotlinRegistrationBridge)
- * and live verification: the server only accepts the request inside the
- * encrypted ENC envelope, the Curve25519 keys go out unprefixed and
- * base64url, e_keytype is the unpadded base64 of the 0x05 prefix byte, regid
- * is 4-byte big-endian, skey id 3-byte big-endian, id is percent-encoded raw
- * bytes, and a stale User-Agent version is refused with reason old_version.
- * reason "incorrect" is the server's answer for a number without a WhatsApp
- * account; wa_old_device_name and the masked email only appear once the
- * account exists.
+ * The /v2/code probe mirrors the Android registration request (the ban
+ * checker services use the same surface): a BANNED number answers with
+ * appeal_token / violation_type / in_app_ban_appeal, a RESTRICTED one with
+ * custom_block_screen or reason "blocked", a clean one with status "sent"
+ * or "ok". Asking with method "wa_old" additionally leaks the primary
+ * device name (wa_old_device_name) and the masked recovery email of the
+ * account — the data the "check wa" tools sell. Side effect, inherent to
+ * the probe: WhatsApp dispatches an OTP notification to the number.
  */
 export const checkNumberInfo = async (phoneNumber, opts = {}) => {
     const digits = String(phoneNumber ?? '').replace(/\D/g, '');
@@ -69,38 +71,48 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
         throw new Boom('could not determine the country calling code; pass opts.countryCode explicitly', { statusCode: 400, data: { phoneNumber } });
     }
     const creds = initAuthCreds();
-    const params = {
+    const method = opts.method ?? 'wa_old';
+    const token = createHash('md5')
+        .update(Buffer.concat([MOBILE_TOKEN_KEY, Buffer.from(nationalNumber, 'utf8')]))
+        .digest('hex');
+    const query = {
         cc: countryCode,
         in: nationalNumber,
+        Rc: '0',
         lg: opts.language ?? 'en',
         lc: opts.locale ?? 'GB',
         mistyped: '6',
         authkey: toBase64Url(creds.noiseKey.public),
-        e_regid: toBase64Url(encodeBigEndian(creds.registrationId, 4)),
+        e_regid: toBase64Url(Buffer.from(creds.registrationId.toString(16).padStart(8, '0').match(/../g).map(byte => Number.parseInt(byte, 16)))),
         e_keytype: 'BQ',
         e_ident: toBase64Url(creds.signedIdentityKey.public),
-        e_skey_id: toBase64Url(encodeBigEndian(creds.signedPreKey.keyId, 3)),
+        e_skey_id: 'AAAA',
         e_skey_val: toBase64Url(creds.signedPreKey.keyPair.public),
         e_skey_sig: toBase64Url(creds.signedPreKey.signature),
         fdid: randomUUID(),
+        network_ratio_type: '1',
         expid: toBase64Url(Buffer.from(randomUUID().replace(/-/g, ''), 'hex')),
-        network_radio_type: '1',
         simnum: '1',
         hasinrc: '1',
-        pid: String(100 + (randomBytes(2).readUInt16BE(0) % 9900)),
-        rc: '0',
-        login: countryCode + nationalNumber,
-        type: '0',
-        id: toPercentHex(randomBytes(20))
+        pid: String(Math.floor(Math.random() * 1000)),
+        id: toPercentHex(randomBytes(20)),
+        backup_token: toPercentHex(randomBytes(20)),
+        token,
+        mcc: String(opts.mcc ?? '510').padStart(3, '0'),
+        mnc: String(opts.mnc ?? '10').padStart(3, '0'),
+        sim_mcc: '000',
+        sim_mnc: '000',
+        method,
+        reason: '',
+        hasav: '1'
     };
-    const plaintext = Object.entries(params).map(([key, value]) => key + '=' + value).join('&');
-    const ephemeral = Curve.generateKeyPair();
-    const sharedKey = Curve.sharedKey(ephemeral.private, REGISTRATION_SERVER_PUBKEY);
-    const ciphertext = aesEncryptGCM(Buffer.from(plaintext, 'utf8'), sharedKey, Buffer.alloc(12), Buffer.alloc(0));
-    const payload = toBase64Url(Buffer.concat([ephemeral.public, ciphertext]));
+    const qs = Object.entries(query)
+        .filter(([, value]) => value !== null && value !== undefined)
+        .map(([key, value]) => `${key}=${urlencode(value)}`)
+        .join('&');
     let response;
     try {
-        response = await fetch(`${EXIST_ENDPOINT}?ENC=${payload}`, {
+        response = await fetch(`${CODE_ENDPOINT}?${qs}`, {
             headers: {
                 'Accept': 'application/json',
                 'User-Agent': opts.userAgent ?? DEFAULT_REGISTRATION_UA
@@ -121,10 +133,14 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
     }
     const status = json.status;
     const reason = json.reason ?? null;
-    const banned = status === 'fail'
-        && (reason === 'blocked' || Boolean(json.violation_type) || Boolean(json.violated_policy) || Boolean(json.custom_block_screen));
-    const registered = status === 'ok';
-    const label = banned ? 'Banned' : registered ? 'Safe' : reason === 'incorrect' ? 'Not Registered' : 'Unknown';
+    const banned = Boolean(json.appeal_token) || Boolean(json.violation_type);
+    const restricted = !banned && (Boolean(json.custom_block_screen) || reason === 'blocked');
+    const clean = ['ok', 'sent'].includes(status);
+    const label = banned ? 'Banned'
+        : restricted ? 'Restricted'
+            : clean ? 'Safe'
+                : reason === 'temporarily_unavailable' ? 'Unavailable'
+                    : 'Unknown';
     const appealToken = json.appeal_token || null;
     const canAppeal = typeof json.in_app_ban_appeal === 'number' ? json.in_app_ban_appeal !== 0 : null;
     return {
@@ -132,8 +148,9 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
             number: maskNationalNumber(nationalNumber),
             countryCode,
             status: label,
-            registered,
+            registered: banned || restricted ? true : clean && method === 'wa_old' ? true : null,
             banned,
+            restricted,
             reason,
             violationType: json.violation_type || null,
             canAppeal,
@@ -144,9 +161,9 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
                 lid: json.lid || null,
                 violatedPolicy: json.violated_policy || null,
                 violationReason: json.violation_reason || null,
-                isDeviceTrusted: typeof json.is_device_trusted === 'boolean' ? json.is_device_trusted : null,
                 retryAfter: json.retry_after ?? null,
-                serverStatus: status ?? null
+                serverStatus: status ?? null,
+                method
             }
         }
     };
