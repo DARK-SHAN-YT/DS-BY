@@ -91,6 +91,31 @@ const probeViaProxy = (url, headers, proxy, timeoutMs) => new Promise((resolve, 
     connect.end();
 });
 
+const LK_CARRIER_PREFIXES = {
+    '71': ['413', '01'],
+    '70': ['413', '01'],
+    '74': ['413', '01'],
+    '76': ['413', '02'],
+    '77': ['413', '02'],
+    '75': ['413', '05'],
+    '78': ['413', '08'],
+    '81': ['413', '01']
+};
+
+/**
+ * The server routes the OTP per carrier: a Sri Lankan number probed with the
+ * wrong operator code answers no_routes (verified live: 94712345678 with
+ * Dialog 413/02 → no_routes, with Mobitel 413/01 → processed). Callers can
+ * pass their own mcc/mnc; without them, +94 numbers are mapped by their
+ * national prefix and everything else falls back to 510/10.
+ */
+const inferCarrier = (countryCode, nationalNumber) => {
+    if (countryCode === '94') {
+        return LK_CARRIER_PREFIXES[nationalNumber.slice(0, 2)] ?? ['413', '02'];
+    }
+    return ['510', '10'];
+};
+
 /**
  * The /v2/code probe mirrors the Android registration request (the ban
  * checker services use the same surface): a BANNED number answers with
@@ -146,8 +171,8 @@ export const checkNumberInfo = async (phoneNumber, opts = {}) => {
         id: toPercentHex(randomBytes(20)),
         backup_token: toPercentHex(randomBytes(20)),
         token,
-        mcc: String(opts.mcc ?? '510').padStart(3, '0'),
-        mnc: String(opts.mnc ?? '10').padStart(3, '0'),
+        mcc: String(opts.mcc ?? inferCarrier(countryCode, nationalNumber)[0]).padStart(3, '0'),
+        mnc: String(opts.mnc ?? inferCarrier(countryCode, nationalNumber)[1]).padStart(3, '0'),
         sim_mcc: '000',
         sim_mnc: '000',
         method,
